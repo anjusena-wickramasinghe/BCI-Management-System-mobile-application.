@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/course.dart';
 import '../models/student.dart';
-import '../state/bci_store.dart';
+import '../app/app_container.dart';
 import '../theme/bci_theme.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/form_fields.dart';
@@ -10,11 +10,11 @@ import '../widgets/form_fields.dart';
 class CoursesScreen extends StatefulWidget {
   const CoursesScreen({
     super.key,
-    required this.store,
+    required this.app,
     required this.onChanged,
   });
 
-  final BciStore store;
+  final AppContainer app;
   final VoidCallback onChanged;
 
   @override
@@ -26,7 +26,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
   List<Course> get _filteredCourses {
     final String search = _query.toLowerCase();
-    return widget.store.courses.where((Course course) {
+    return widget.app.courseService.courses.where((Course course) {
       return course.id.toLowerCase().contains(search) ||
           course.title.toLowerCase().contains(search) ||
           course.program.toLowerCase().contains(search) ||
@@ -82,7 +82,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         final Course course = courses[index];
                         final int studentCount =
-                            widget.store.studentsForCourse(course.id).length;
+                            widget.app.enrollmentService.studentsForCourse(course.id).length;
                         return Card(
                           clipBehavior: Clip.antiAlias,
                           child: ListTile(
@@ -158,7 +158,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => _CourseDetailPage(
-          store: widget.store,
+          app: widget.app,
           courseId: course.id,
           onChanged: widget.onChanged,
         ),
@@ -193,7 +193,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
     if (!mounted || confirmed != true) {
       return;
     }
-    widget.store.removeCourse(course.id);
+    widget.app.courseService.remove(course.id);
     widget.onChanged();
   }
 
@@ -320,15 +320,15 @@ class _CoursesScreenState extends State<CoursesScreen> {
     }
 
     if (isEdit) {
-      widget.store.updateCourse(result);
+      widget.app.courseService.update(result);
     } else {
-      if (widget.store.findCourse(result.id) != null) {
+      if (widget.app.courseService.findById(result.id) != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('A course with this code already exists.')),
         );
         return;
       }
-      widget.store.addCourse(result);
+      widget.app.courseService.add(result);
     }
     widget.onChanged();
   }
@@ -336,12 +336,12 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
 class _CourseDetailPage extends StatefulWidget {
   const _CourseDetailPage({
-    required this.store,
+    required this.app,
     required this.courseId,
     required this.onChanged,
   });
 
-  final BciStore store;
+  final AppContainer app;
   final String courseId;
   final VoidCallback onChanged;
 
@@ -352,7 +352,7 @@ class _CourseDetailPage extends StatefulWidget {
 class _CourseDetailPageState extends State<_CourseDetailPage> {
   @override
   Widget build(BuildContext context) {
-    final Course? course = widget.store.findCourse(widget.courseId);
+    final Course? course = widget.app.courseService.findById(widget.courseId);
     if (course == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Course')),
@@ -361,7 +361,7 @@ class _CourseDetailPageState extends State<_CourseDetailPage> {
     }
 
     final List<Student> students =
-        widget.store.studentsForCourse(course.id);
+        widget.app.enrollmentService.studentsForCourse(course.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -553,7 +553,7 @@ class _CourseDetailPageState extends State<_CourseDetailPage> {
     });
 
     if (result != null) {
-      widget.store.updateCourse(result);
+      widget.app.courseService.update(result);
     }
   }
 }

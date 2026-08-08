@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../state/bci_store.dart';
+import '../app/app_container.dart';
 import '../theme/bci_theme.dart';
 import '../widgets/summary_card.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key, required this.store});
+  const DashboardScreen({super.key, required this.app});
 
-  final BciStore store;
+  final AppContainer app;
 
   @override
   Widget build(BuildContext context) {
@@ -40,23 +40,23 @@ class DashboardScreen extends StatelessWidget {
             final List<Widget> cards = <Widget>[
               SummaryCard(
                 title: 'Students',
-                value: store.students.length.toString(),
-                subtitle: '${store.activeStudentCount} active',
+                value: app.studentService.students.length.toString(),
+                subtitle: '${app.studentService.activeCount} active',
                 icon: Icons.school_outlined,
                 accent: BciColors.navy,
                 accentSoft: BciColors.sky,
               ),
               SummaryCard(
                 title: 'Courses',
-                value: store.courses.length.toString(),
-                subtitle: '${store.activeCourseCount} active',
+                value: app.courseService.courses.length.toString(),
+                subtitle: '${app.courseService.activeCount} active',
                 icon: Icons.menu_book_outlined,
                 accent: BciColors.gold,
                 accentSoft: BciColors.goldSoft,
               ),
               SummaryCard(
                 title: 'Enrolments',
-                value: store.enrollments.length.toString(),
+                value: app.enrollmentService.enrollments.length.toString(),
                 subtitle: 'Student–course links',
                 icon: Icons.how_to_reg_outlined,
                 accent: BciColors.teal,

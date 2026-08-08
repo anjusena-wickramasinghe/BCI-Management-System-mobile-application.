@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import '../models/course.dart';
 import '../models/enrollment.dart';
 import '../models/student.dart';
-import '../state/bci_store.dart';
+import '../app/app_container.dart';
 import '../theme/bci_theme.dart';
 import '../widgets/app_dialog.dart';
 
 class EnrollmentsScreen extends StatefulWidget {
   const EnrollmentsScreen({
     super.key,
-    required this.store,
+    required this.app,
     required this.onChanged,
   });
 
-  final BciStore store;
+  final AppContainer app;
   final VoidCallback onChanged;
 
   @override
@@ -26,9 +26,9 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
 
   List<Enrollment> get _filteredEnrollments {
     final String search = _query.toLowerCase();
-    return widget.store.enrollments.where((Enrollment enrollment) {
-      final Student? student = widget.store.findStudent(enrollment.studentId);
-      final Course? course = widget.store.findCourse(enrollment.courseId);
+    return widget.app.enrollmentService.enrollments.where((Enrollment enrollment) {
+      final Student? student = widget.app.studentService.findById(enrollment.studentId);
+      final Course? course = widget.app.courseService.findById(enrollment.courseId);
       final String haystack = <String>[
         enrollment.id,
         enrollment.studentId,
@@ -89,9 +89,9 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         final Enrollment enrollment = enrollments[index];
                         final Student? student =
-                            widget.store.findStudent(enrollment.studentId);
+                            widget.app.studentService.findById(enrollment.studentId);
                         final Course? course =
-                            widget.store.findCourse(enrollment.courseId);
+                            widget.app.courseService.findById(enrollment.courseId);
 
                         return Card(
                           child: ListTile(
@@ -169,12 +169,12 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
     if (!mounted || confirmed != true) {
       return;
     }
-    widget.store.removeEnrollment(enrollment.id);
+    widget.app.enrollmentService.remove(enrollment.id);
     widget.onChanged();
   }
 
   Future<void> _showEnrollDialog() async {
-    if (widget.store.students.isEmpty || widget.store.courses.isEmpty) {
+    if (widget.app.studentService.students.isEmpty || widget.app.courseService.courses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Add at least one student and one course first.'),
@@ -184,8 +184,8 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
     }
 
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    String? selectedStudentId = widget.store.students.first.id;
-    String? selectedCourseId = widget.store.courses.first.id;
+    String? selectedStudentId = widget.app.studentService.students.first.id;
+    String? selectedCourseId = widget.app.courseService.courses.first.id;
     String? errorText;
 
     final bool? enrolled = await showDialog<bool>(
@@ -211,7 +211,7 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
                           labelText: 'Student',
                           border: OutlineInputBorder(),
                         ),
-                        items: widget.store.students
+                        items: widget.app.studentService.students
                             .map(
                               (Student student) => DropdownMenuItem<String>(
                                 value: student.id,
@@ -238,7 +238,7 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
                           labelText: 'Course',
                           border: OutlineInputBorder(),
                         ),
-                        items: widget.store.courses
+                        items: widget.app.courseService.courses
                             .map(
                               (Course course) => DropdownMenuItem<String>(
                                 value: course.id,
@@ -280,7 +280,7 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
                     return;
                   }
 
-                  final String? message = widget.store.canEnroll(
+                  final String? message = widget.app.enrollmentService.canEnroll(
                     studentId: selectedStudentId!,
                     courseId: selectedCourseId!,
                   );
@@ -303,7 +303,7 @@ class _EnrollmentsScreenState extends State<EnrollmentsScreen> {
       return;
     }
 
-    widget.store.enrollStudent(
+    widget.app.enrollmentService.enroll(
       studentId: selectedStudentId!,
       courseId: selectedCourseId!,
     );

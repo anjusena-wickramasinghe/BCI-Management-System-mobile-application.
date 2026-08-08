@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/course.dart';
 import '../models/student.dart';
-import '../state/bci_store.dart';
+import '../app/app_container.dart';
 import '../theme/bci_theme.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/form_fields.dart';
@@ -10,11 +10,11 @@ import '../widgets/form_fields.dart';
 class StudentsScreen extends StatefulWidget {
   const StudentsScreen({
     super.key,
-    required this.store,
+    required this.app,
     required this.onChanged,
   });
 
-  final BciStore store;
+  final AppContainer app;
   final VoidCallback onChanged;
 
   @override
@@ -26,7 +26,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   List<Student> get _filteredStudents {
     final String search = _query.toLowerCase();
-    return widget.store.students.where((Student student) {
+    return widget.app.studentService.students.where((Student student) {
       return student.id.toLowerCase().contains(search) ||
           student.name.toLowerCase().contains(search) ||
           student.program.toLowerCase().contains(search) ||
@@ -81,7 +81,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (BuildContext context, int index) {
                         final Student student = students[index];
-                        final int courseCount = widget.store
+                        final int courseCount = widget.app.enrollmentService
                             .enrollmentCountForStudent(student.id);
                         return Card(
                           clipBehavior: Clip.antiAlias,
@@ -156,7 +156,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => _StudentDetailPage(
-          store: widget.store,
+          app: widget.app,
           studentId: student.id,
           onChanged: widget.onChanged,
         ),
@@ -191,7 +191,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     if (!mounted || confirmed != true) {
       return;
     }
-    widget.store.removeStudent(student.id);
+    widget.app.studentService.remove(student.id);
     widget.onChanged();
   }
 
@@ -317,15 +317,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
     }
 
     if (isEdit) {
-      widget.store.updateStudent(result);
+      widget.app.studentService.update(result);
     } else {
-      if (widget.store.findStudent(result.id) != null) {
+      if (widget.app.studentService.findById(result.id) != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('A student with this ID already exists.')),
         );
         return;
       }
-      widget.store.addStudent(result);
+      widget.app.studentService.add(result);
     }
     widget.onChanged();
   }
@@ -333,12 +333,12 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
 class _StudentDetailPage extends StatefulWidget {
   const _StudentDetailPage({
-    required this.store,
+    required this.app,
     required this.studentId,
     required this.onChanged,
   });
 
-  final BciStore store;
+  final AppContainer app;
   final String studentId;
   final VoidCallback onChanged;
 
@@ -349,7 +349,7 @@ class _StudentDetailPage extends StatefulWidget {
 class _StudentDetailPageState extends State<_StudentDetailPage> {
   @override
   Widget build(BuildContext context) {
-    final Student? student = widget.store.findStudent(widget.studentId);
+    final Student? student = widget.app.studentService.findById(widget.studentId);
     if (student == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Student')),
@@ -358,7 +358,7 @@ class _StudentDetailPageState extends State<_StudentDetailPage> {
     }
 
     final List<Course> courses =
-        widget.store.coursesForStudent(student.id);
+        widget.app.enrollmentService.coursesForStudent(student.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -435,7 +435,7 @@ class _StudentDetailPageState extends State<_StudentDetailPage> {
                   trailing: IconButton(
                     tooltip: 'Unenrol',
                     onPressed: () {
-                      widget.store.removeEnrollmentByPair(
+                      widget.app.enrollmentService.removeByPair(
                         studentId: student.id,
                         courseId: course.id,
                       );
@@ -560,7 +560,7 @@ class _StudentDetailPageState extends State<_StudentDetailPage> {
     });
 
     if (result != null) {
-      widget.store.updateStudent(result);
+      widget.app.studentService.update(result);
     }
   }
 }

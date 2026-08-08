@@ -36,6 +36,18 @@ On a course detail page you also see **Enrolled students**.
 
 Duplicate enrolments (same student + same course) are blocked.
 
+## SOLID principles (Assignment 02)
+
+See **[docs/SOLID.md](docs/SOLID.md)** for a full mapping. Summary:
+
+| Principle | How it is applied |
+|-----------|-------------------|
+| **S**ingle Responsibility | Separate student / course / enrolment services and repositories |
+| **O**pen/Closed | New storage (e.g. API) can implement the same repository interfaces without changing services |
+| **L**iskov Substitution | In-memory repositories fully implement their interfaces and are interchangeable |
+| **I**nterface Segregation | Small interfaces (`IStudentRepository`, `ICourseRepository`, `IEnrollmentRepository`, plus matching services) instead of one fat store |
+| **D**ependency Inversion | Services and UI depend on abstractions; `AppContainer` wires concrete classes |
+
 ## App navigation
 
 - **Home** — summary counts and short guide  
@@ -60,17 +72,21 @@ flutter run -d chrome
 flutter run                 # phone / emulator
 ```
 
-If you see an old red error screen in the browser, close that tab and run again on a fresh device/port.
-
 ## Project structure
 
 ```
 lib/
-  main.dart                 # App entry
-  models/                   # Student, Course, Enrollment
-  state/bci_store.dart      # In-memory data + business rules
-  screens/                  # Home, Students, Courses, Enrol
-  widgets/                  # Shared UI helpers
+  main.dart                      # Composition root entry
+  app/app_container.dart         # DI wiring (DIP)
+  core/interfaces/               # Abstractions contracts (ISP + DIP)
+  data/                          # In-memory repository implementations (LSP + OCP)
+  services/                      # Business rules per domain (SRP)
+  models/                        # Student, Course, Enrollment
+  screens/                       # Home, Students, Courses, Enrol
+  widgets/                       # Shared UI helpers
+  theme/                         # BCI colour theme
+docs/
+  SOLID.md                       # SOLID explanation for reviewers
 ```
 
 ## Validation rules

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../state/bci_store.dart';
+import '../app/app_container.dart';
 import 'courses_screen.dart';
 import 'dashboard_screen.dart';
 import 'enrollments_screen.dart';
 import 'students_screen.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, required this.store});
+  const HomeShell({super.key, required this.app});
 
-  final BciStore store;
+  final AppContainer app;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -51,15 +51,15 @@ class _HomeShellState extends State<HomeShell> {
   Widget _pageForIndex(int index) {
     switch (index) {
       case 0:
-        return DashboardScreen(store: widget.store);
+        return DashboardScreen(app: widget.app);
       case 1:
-        return StudentsScreen(store: widget.store, onChanged: _refresh);
+        return StudentsScreen(app: widget.app, onChanged: _refresh);
       case 2:
-        return CoursesScreen(store: widget.store, onChanged: _refresh);
+        return CoursesScreen(app: widget.app, onChanged: _refresh);
       case 3:
-        return EnrollmentsScreen(store: widget.store, onChanged: _refresh);
+        return EnrollmentsScreen(app: widget.app, onChanged: _refresh);
       default:
-        return DashboardScreen(store: widget.store);
+        return DashboardScreen(app: widget.app);
     }
   }
 
