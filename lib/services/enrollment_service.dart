@@ -1,3 +1,4 @@
+import '../core/app_constants.dart';
 import '../core/interfaces/course_repository.dart';
 import '../core/interfaces/enrollment_repository.dart';
 import '../core/interfaces/enrollment_service.dart';
@@ -26,31 +27,35 @@ class EnrollmentService implements IEnrollmentService {
 
   @override
   List<Course> coursesForStudent(String studentId) {
-    final List<Course> result = <Course>[];
-    for (final Enrollment enrollment in _enrollments.getAll()) {
-      if (enrollment.studentId != studentId ||
-          enrollment.status != 'Enrolled') {
-        continue;
-      }
-      final Course? course = _courses.findById(enrollment.courseId);
-      if (course != null) {
-        result.add(course);
-      }
-    }
-    return result;
+    return _linkedEntities<Course>(
+      matches: (Enrollment enrollment) => enrollment.studentId == studentId,
+      resolve: (Enrollment enrollment) =>
+          _courses.findById(enrollment.courseId),
+    );
   }
 
   @override
   List<Student> studentsForCourse(String courseId) {
-    final List<Student> result = <Student>[];
+    return _linkedEntities<Student>(
+      matches: (Enrollment enrollment) => enrollment.courseId == courseId,
+      resolve: (Enrollment enrollment) =>
+          _students.findById(enrollment.studentId),
+    );
+  }
+
+  List<T> _linkedEntities<T>({
+    required bool Function(Enrollment enrollment) matches,
+    required T? Function(Enrollment enrollment) resolve,
+  }) {
+    final List<T> result = <T>[];
     for (final Enrollment enrollment in _enrollments.getAll()) {
-      if (enrollment.courseId != courseId ||
-          enrollment.status != 'Enrolled') {
+      if (!matches(enrollment) ||
+          enrollment.status != AppStatus.enrolled) {
         continue;
       }
-      final Student? student = _students.findById(enrollment.studentId);
-      if (student != null) {
-        result.add(student);
+      final T? item = resolve(enrollment);
+      if (item != null) {
+        result.add(item);
       }
     }
     return result;
@@ -76,7 +81,7 @@ class EnrollmentService implements IEnrollmentService {
           (Enrollment enrollment) =>
               enrollment.studentId == studentId &&
               enrollment.courseId == courseId &&
-              enrollment.status == 'Enrolled',
+              enrollment.status == AppStatus.enrolled,
         );
     if (alreadyEnrolled) {
       return 'This student is already enrolled in that course.';
@@ -100,7 +105,7 @@ class EnrollmentService implements IEnrollmentService {
         studentId: studentId,
         courseId: courseId,
         enrolledOn: _todayLabel(),
-        status: 'Enrolled',
+        status: AppStatus.enrolled,
       ),
     );
     return null;

@@ -1,3 +1,4 @@
+import '../core/app_constants.dart';
 import '../core/interfaces/course_repository.dart';
 import '../core/interfaces/course_service.dart';
 import '../core/interfaces/enrollment_repository.dart';
@@ -20,7 +21,7 @@ class CourseService implements ICourseService {
 
   @override
   int get activeCount =>
-      _courses.getAll().where((Course c) => c.status == 'Active').length;
+      _courses.getAll().where((Course c) => c.status == AppStatus.active).length;
 
   @override
   Course? findById(String id) => _courses.findById(id);

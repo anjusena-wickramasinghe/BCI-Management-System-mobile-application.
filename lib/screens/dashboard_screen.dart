@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../app/app_container.dart';
 import '../theme/bci_theme.dart';
+import '../widgets/entity_widgets.dart';
+import '../widgets/page_layout.dart';
 import '../widgets/summary_card.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -14,16 +16,9 @@ class DashboardScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: <Widget>[
-        Text(
-          'BCI Management',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Manage students, courses and enrolments in one place',
-          style: Theme.of(context).textTheme.bodyLarge,
+        const PageHeader(
+          title: 'BCI Management',
+          subtitle: 'Manage students, courses and enrolments in one place',
         ),
         const SizedBox(height: 20),
         LayoutBuilder(
@@ -131,9 +126,10 @@ class _GuideRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: EntityAvatar(
         backgroundColor: BciColors.sky,
-        child: Icon(icon, color: BciColors.navy),
+        foregroundColor: BciColors.navy,
+        icon: icon,
       ),
       title: Text(
         title,

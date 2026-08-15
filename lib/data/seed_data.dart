@@ -1,3 +1,4 @@
+import '../core/app_constants.dart';
 import '../models/course.dart';
 import '../models/enrollment.dart';
 import '../models/student.dart';
@@ -13,7 +14,7 @@ class SeedData {
           email: 'ayesha@students.bci.lk',
           program: 'BSc Software Engineering',
           intake: 'February 2026',
-          status: 'Active',
+          status: AppStatus.active,
         ),
         const Student(
           id: 'BCI-2026-002',
@@ -21,7 +22,7 @@ class SeedData {
           email: 'nimal@students.bci.lk',
           program: 'BSc Information Technology',
           intake: 'February 2026',
-          status: 'Active',
+          status: AppStatus.active,
         ),
         const Student(
           id: 'BCI-2025-118',
@@ -29,7 +30,7 @@ class SeedData {
           email: 'tharushi@students.bci.lk',
           program: 'BSc Computer Science',
           intake: 'September 2025',
-          status: 'Active',
+          status: AppStatus.active,
         ),
       ];
 
@@ -40,7 +41,7 @@ class SeedData {
           program: 'BSc Software Engineering',
           credits: 15,
           lecturer: 'Dr. Amal Jayasinghe',
-          status: 'Active',
+          status: AppStatus.active,
         ),
         const Course(
           id: 'IT210',
@@ -48,7 +49,7 @@ class SeedData {
           program: 'BSc Information Technology',
           credits: 15,
           lecturer: 'Dr. Amal Jayasinghe',
-          status: 'Active',
+          status: AppStatus.active,
         ),
         const Course(
           id: 'CS120',
@@ -56,7 +57,7 @@ class SeedData {
           program: 'BSc Computer Science',
           credits: 20,
           lecturer: 'Rashmi Perera',
-          status: 'Active',
+          status: AppStatus.active,
         ),
       ];
 
@@ -66,21 +67,21 @@ class SeedData {
           studentId: 'BCI-2026-001',
           courseId: 'SE301',
           enrolledOn: '26 July 2026',
-          status: 'Enrolled',
+          status: AppStatus.enrolled,
         ),
         const Enrollment(
           id: 'ENR-002',
           studentId: 'BCI-2026-002',
           courseId: 'IT210',
           enrolledOn: '26 July 2026',
-          status: 'Enrolled',
+          status: AppStatus.enrolled,
         ),
         const Enrollment(
           id: 'ENR-003',
           studentId: 'BCI-2025-118',
           courseId: 'CS120',
           enrolledOn: '26 July 2026',
-          status: 'Enrolled',
+          status: AppStatus.enrolled,
         ),
       ];
 }

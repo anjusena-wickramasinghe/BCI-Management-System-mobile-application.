@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/app_constants.dart';
+
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
@@ -46,6 +48,70 @@ class AppTextField extends StatelessWidget {
           return null;
         },
       ),
+    );
+  }
+}
+
+class AppDropdownField<T> extends StatelessWidget {
+  const AppDropdownField({
+    super.key,
+    required this.value,
+    required this.label,
+    required this.items,
+    required this.onChanged,
+    this.validator,
+  });
+
+  final T? value;
+  final String label;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final FormFieldValidator<T>? validator;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<T>(
+      isExpanded: true,
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: items,
+      onChanged: onChanged,
+      validator: validator,
+    );
+  }
+}
+
+class StatusDropdown extends StatelessWidget {
+  const StatusDropdown({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppDropdownField<String>(
+      value: value,
+      label: 'Status',
+      items: AppStatus.recordStatuses
+          .map(
+            (String status) => DropdownMenuItem<String>(
+              value: status,
+              child: Text(status),
+            ),
+          )
+          .toList(),
+      onChanged: (String? selected) {
+        if (selected != null) {
+          onChanged(selected);
+        }
+      },
     );
   }
 }

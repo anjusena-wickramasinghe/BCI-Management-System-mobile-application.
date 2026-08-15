@@ -1,4 +1,6 @@
-class Student {
+import '../core/identifiable.dart';
+
+class Student implements Identifiable {
   const Student({
     required this.id,
     required this.name,
@@ -8,6 +10,7 @@ class Student {
     required this.status,
   });
 
+  @override
   final String id;
   final String name;
   final String email;

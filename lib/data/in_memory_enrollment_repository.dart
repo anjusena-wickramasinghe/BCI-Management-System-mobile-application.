@@ -1,5 +1,6 @@
 import '../core/interfaces/enrollment_repository.dart';
 import '../models/enrollment.dart';
+import 'in_memory_store.dart';
 import 'seed_data.dart';
 
 /// LSP: fully substitutable for [IEnrollmentRepository].
@@ -7,41 +8,30 @@ class InMemoryEnrollmentRepository implements IEnrollmentRepository {
   InMemoryEnrollmentRepository({
     List<Enrollment>? initial,
     int startingCounter = 3,
-  })  : _enrollments = List<Enrollment>.from(initial ?? SeedData.enrollments()),
+  })  : _store = InMemoryStore<Enrollment>(initial ?? SeedData.enrollments()),
         _counter = startingCounter;
 
-  final List<Enrollment> _enrollments;
+  final InMemoryStore<Enrollment> _store;
   int _counter;
 
   @override
-  List<Enrollment> getAll() => List<Enrollment>.unmodifiable(_enrollments);
+  List<Enrollment> getAll() => _store.getAll();
 
   @override
-  Enrollment? findById(String id) {
-    for (final Enrollment enrollment in _enrollments) {
-      if (enrollment.id == id) {
-        return enrollment;
-      }
-    }
-    return null;
-  }
+  Enrollment? findById(String id) => _store.findById(id);
 
   @override
-  void add(Enrollment enrollment) => _enrollments.add(enrollment);
+  void add(Enrollment enrollment) => _store.add(enrollment);
 
   @override
-  bool remove(String id) {
-    final int before = _enrollments.length;
-    _enrollments.removeWhere((Enrollment e) => e.id == id);
-    return _enrollments.length < before;
-  }
+  bool remove(String id) => _store.remove(id);
 
   @override
   bool removeByStudentAndCourse({
     required String studentId,
     required String courseId,
   }) {
-    final int index = _enrollments.indexWhere(
+    final int index = _store.indexWhere(
       (Enrollment enrollment) =>
           enrollment.studentId == studentId &&
           enrollment.courseId == courseId,
@@ -49,20 +39,20 @@ class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     if (index < 0) {
       return false;
     }
-    _enrollments.removeAt(index);
+    _store.removeAt(index);
     return true;
   }
 
   @override
   void removeByStudentId(String studentId) {
-    _enrollments.removeWhere(
+    _store.removeWhere(
       (Enrollment enrollment) => enrollment.studentId == studentId,
     );
   }
 
   @override
   void removeByCourseId(String courseId) {
-    _enrollments.removeWhere(
+    _store.removeWhere(
       (Enrollment enrollment) => enrollment.courseId == courseId,
     );
   }

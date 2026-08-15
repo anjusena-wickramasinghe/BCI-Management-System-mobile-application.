@@ -1,3 +1,4 @@
+import '../core/app_constants.dart';
 import '../core/interfaces/enrollment_repository.dart';
 import '../core/interfaces/student_repository.dart';
 import '../core/interfaces/student_service.dart';
@@ -20,7 +21,7 @@ class StudentService implements IStudentService {
 
   @override
   int get activeCount =>
-      _students.getAll().where((Student s) => s.status == 'Active').length;
+      _students.getAll().where((Student s) => s.status == AppStatus.active).length;
 
   @override
   Student? findById(String id) => _students.findById(id);

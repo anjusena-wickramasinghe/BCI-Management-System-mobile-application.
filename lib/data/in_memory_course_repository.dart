@@ -1,45 +1,27 @@
 import '../core/interfaces/course_repository.dart';
 import '../models/course.dart';
+import 'in_memory_store.dart';
 import 'seed_data.dart';
 
 /// LSP: fully substitutable for [ICourseRepository].
 class InMemoryCourseRepository implements ICourseRepository {
   InMemoryCourseRepository({List<Course>? initial})
-      : _courses = List<Course>.from(initial ?? SeedData.courses());
+      : _store = InMemoryStore<Course>(initial ?? SeedData.courses());
 
-  final List<Course> _courses;
-
-  @override
-  List<Course> getAll() => List<Course>.unmodifiable(_courses);
+  final InMemoryStore<Course> _store;
 
   @override
-  Course? findById(String id) {
-    for (final Course course in _courses) {
-      if (course.id == id) {
-        return course;
-      }
-    }
-    return null;
-  }
+  List<Course> getAll() => _store.getAll();
 
   @override
-  void add(Course course) => _courses.add(course);
+  Course? findById(String id) => _store.findById(id);
 
   @override
-  bool update(Course course) {
-    final int index =
-        _courses.indexWhere((Course item) => item.id == course.id);
-    if (index < 0) {
-      return false;
-    }
-    _courses[index] = course;
-    return true;
-  }
+  void add(Course course) => _store.add(course);
 
   @override
-  bool remove(String id) {
-    final int before = _courses.length;
-    _courses.removeWhere((Course course) => course.id == id);
-    return _courses.length < before;
-  }
+  bool update(Course course) => _store.update(course);
+
+  @override
+  bool remove(String id) => _store.remove(id);
 }

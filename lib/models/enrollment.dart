@@ -1,4 +1,6 @@
-class Enrollment {
+import '../core/identifiable.dart';
+
+class Enrollment implements Identifiable {
   const Enrollment({
     required this.id,
     required this.studentId,
@@ -7,6 +9,7 @@ class Enrollment {
     required this.status,
   });
 
+  @override
   final String id;
   final String studentId;
   final String courseId;
